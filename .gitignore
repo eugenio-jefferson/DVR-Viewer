@@ -193,3 +193,8 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 DVR-Viewer.code-workspace
+
+*.dist/
+*.build/
+*.onefile-build/
+*.bin
