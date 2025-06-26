@@ -71,6 +71,19 @@ class ConfigurationManager:
     @property
     def exists_last_username(self):
         return self.last_username is not None and self.last_username != ""
+    
+    @property
+    def channel_numbers(self):
+        return self.settings['user_data'].get('channel_numbers')
+    
+    @channel_numbers.setter
+    def channel_numbers(self, value):
+        self.settings['user_data']['channel_numbers'] = value
+        self.save_config()
+        
+    @property
+    def exists_channel_numbers(self):
+        return self.channel_numbers is not None and self.channel_numbers > 0
 
     def save_config(self):
         try:
