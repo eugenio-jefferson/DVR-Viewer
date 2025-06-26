@@ -1,6 +1,6 @@
 class DVRViewer:
-    from configuration_manager import ConfigurationManager
-    from credentials_manager import CredentialsManager
+    from src.services.configuration_manager import ConfigurationManager
+    from src.services.credentials_manager import CredentialsManager
     import tkinter as tk
     from tkinter import simpledialog
 
@@ -15,7 +15,7 @@ class DVRViewer:
         self.start()
 
     def start(self):
-        from automation import Automation
+        from src.core.automation import Automation
         import asyncio
         from playwright._impl._errors import TargetClosedError
 

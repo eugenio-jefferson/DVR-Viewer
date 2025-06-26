@@ -13,7 +13,7 @@ class ConfigurationManager:
             'program_data': {
                 'name': 'DVR-Viewer',
                 'author': 'Eugenio Jefferson',
-                'version': 'alpha 1.0'
+                'version': '1.0'
             },
         }
     )
@@ -71,16 +71,16 @@ class ConfigurationManager:
     @property
     def exists_last_username(self):
         return self.last_username is not None and self.last_username != ""
-    
+
     @property
     def channel_numbers(self):
         return self.settings['user_data'].get('channel_numbers')
-    
+
     @channel_numbers.setter
     def channel_numbers(self, value):
         self.settings['user_data']['channel_numbers'] = value
         self.save_config()
-        
+
     @property
     def exists_channel_numbers(self):
         return self.channel_numbers is not None and self.channel_numbers > 0
@@ -96,10 +96,15 @@ class ConfigurationManager:
     def load_config(self):
         if self.is_empty:
             print("Config file is empty or does not exist.")
-
+        
+        app_version = self._shared_state['settings']['program_data']['version']
+        
         try:
             with open(self.config_file_path, 'r', encoding='utf-8') as file:
                 self.settings = json.load(file)
-
+            
+            if self.settings['program_data']['version'] != app_version:
+                self.settings['program_data']['version'] = app_version
+                self.save_config()
         except Exception as e:
             print(f"Exception in load_config: {e}")
