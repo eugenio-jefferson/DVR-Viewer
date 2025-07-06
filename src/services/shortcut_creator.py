@@ -23,17 +23,18 @@ class ShortchutCreator:
 
     def _create_shortcut_in_linux(self):
         application_directory = Path.home() / ".local/share/applications"
-        os.makedirs(application_directory, exist_ok=True)
-
         shortcut_path = application_directory / f"{self.PROGRAM_NAME}.desktop"
 
         if not shortcut_path.exists():
+            os.makedirs(application_directory, exist_ok=True)
+            
             shortcut_file_content = f"""
 [Desktop Entry]
 Version={self.PROGRAM_VERSION}
 Type=Application
 Name={self.PROGRAM_NAME}
-Comment=Assistente para visualizar rapidamente as câmeras no DVR Intelbras
+Comment=Wizard to quickly view cameras on the Intelbras DVR
+Comment[pt_BR]=Assistente para visualizar rapidamente as câmeras no DVR Intelbras
 Exec="{self.executable_path}"
 Icon={self.icon_directory_path / "icon.png"}
 Type=Application
