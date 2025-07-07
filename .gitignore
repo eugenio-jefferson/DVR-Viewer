@@ -198,4 +198,5 @@ DVR-Viewer.code-workspace
 *.build/
 *.onefile-build/
 *.bin
-DVR-Viewer
+DVR-Viewer*
+*.exe

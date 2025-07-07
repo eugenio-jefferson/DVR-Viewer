@@ -14,7 +14,7 @@ class ConfigurationManager:
             'program_data': {
                 'name': 'DVR-Viewer',
                 'author': 'Eugenio Jefferson',
-                'version': '1.0'
+                'version': '1.1'
             },
         }
     )
