@@ -1,18 +1,14 @@
+from src.services.configuration_manager import ConfigurationManager
+from src.services.credentials_manager import CredentialsManager
+from src.gui.gui_manager import GUIManager
+
+
 class DVRViewer:
-    from src.services.configuration_manager import ConfigurationManager
-    from src.services.credentials_manager import CredentialsManager
-    import tkinter as tk
-    from tkinter import simpledialog
-
     def __init__(self):
-        self.root = self.tk.Tk()
-        self.root.withdraw()
-
-        self._configuration_manager = self.ConfigurationManager()
-        self._credentials_manager = self.CredentialsManager(
+        self.gui = GUIManager()
+        self._configuration_manager = ConfigurationManager()
+        self._credentials_manager = CredentialsManager(
             self._configuration_manager.program_name)
-
-        self.start()
 
     def start(self):
         from src.core.automation import Automation
@@ -34,21 +30,22 @@ class DVRViewer:
             asyncio.run(automation.run())
 
         except ValueError as exception:
-            self.show_error(f"{exception}")
+            self.gui.show_error(f"{exception}")
 
             self._credentials_manager.delete_credential(
                 self._configuration_manager.last_username)
             self._configuration_manager.last_username = None
 
         except TargetClosedError as exception:
-            self.show_error("Verifique se o URL é válido e se está acessível.")
+            self.gui.show_error(
+                "Verifique se o URL é válido e se está acessível.")
 
         except Exception as exception:
-            self.show_error(f"Erro ao iniciar a automação: {exception}")
-            
+            self.gui.show_error(f"Erro ao iniciar a automação: {exception}")
+
         finally:
             del automation
-            del self.__dict__            
+            del self.__dict__
 
     def validate_data(self):
         if not self._configuration_manager.exists_dvr_url:
@@ -65,16 +62,16 @@ class DVRViewer:
 
         self._credential = self._credentials_manager.get_credential(
             self._configuration_manager.last_username)
-        
+
         if not self._configuration_manager.channel_numbers:
             self.request_channel_numbers()
 
     def request_url(self):
-        response = self.simpledialog.askstring(
-            title=f"{self._configuration_manager.program_name}",
-            prompt="Insira a URL de login do DVR:",
-            initialvalue=self._configuration_manager.dvr_url or ""
+        response = self.gui.request_an_string(
+            "Insira a URL de login do DVR:",
+            self._configuration_manager.dvr_url
         )
+
         if response is not None and response.strip() != "":
             self._configuration_manager.dvr_url = response.strip()
 
@@ -82,11 +79,11 @@ class DVRViewer:
             raise ValueError("URL de login do DVR não informada.")
 
     def request_username(self):
-        response = self.simpledialog.askstring(
-            title=f"{self._configuration_manager.program_name}",
-            prompt="Insira o seu nome de usuário do DVR:",
-            initialvalue=self._configuration_manager.last_username or ""
+        response = self.gui.request_an_string(
+            "Insira o seu nome de usuário do DVR:",
+            self._configuration_manager.last_username
         )
+
         if response is not None and response.strip() != "":
             self._configuration_manager.last_username = response.strip()
 
@@ -94,11 +91,8 @@ class DVRViewer:
             raise ValueError("Nome de usuário não informado.")
 
     def request_password(self):
-        response = self.simpledialog.askstring(
-            title=f"{self._configuration_manager.program_name}",
-            prompt="Insira a sua senha do DVR:",
-            show="*"
-        )
+        response = self.gui.request_password("Insira a sua senha do DVR:")
+
         if response is not None:
             self._credentials_manager.set_credential(
                 self._configuration_manager.last_username,
@@ -109,20 +103,13 @@ class DVRViewer:
             raise ValueError("Senha não informada.")
 
     def request_channel_numbers(self):
-        response = self.simpledialog.askinteger(
-            title=f"{self._configuration_manager.program_name}",
-            prompt="Insira a quantidade de canais para visualização:",
-            initialvalue=self._configuration_manager.channel_numbers or None
+        response = self.gui.request_an_integer(
+            "Insira a quantidade de canais para visualização:",
+            self._configuration_manager.channel_numbers
         )
+
         if response is not None and response > 0:
             self._configuration_manager.channel_numbers = response
 
         else:
             raise ValueError("Quantidade de canais é inválida.")
-    
-    def show_error(self, message):
-        self.simpledialog.messagebox.showerror(
-            title=f"{self._configuration_manager.program_name}  -  Erro",
-            message=message + "\n\nO programa será encerrado."
-        )
-        self.root.destroy()

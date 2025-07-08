@@ -2,6 +2,7 @@ import os
 import platformdirs
 from pathlib import Path
 import json
+from src.gui.gui_manager import GUIManager
 
 
 class ConfigurationManager:
@@ -13,7 +14,7 @@ class ConfigurationManager:
             'program_data': {
                 'name': 'DVR-Viewer',
                 'author': 'Eugenio Jefferson',
-                'version': '1.0'
+                'version': '1.1'
             },
         }
     )
@@ -23,6 +24,7 @@ class ConfigurationManager:
 
     def __init__(self):
         self.__dict__ = self._shared_state
+        self.gui = GUIManager()
 
         self._ensure_directory_exists()
 
@@ -45,6 +47,14 @@ class ConfigurationManager:
     @property
     def program_name(self):
         return self.settings['program_data'].get('name')
+
+    @property
+    def program_author(self):
+        return self.settings['program_data'].get('author')
+
+    @property
+    def program_version(self):
+        return self.settings['program_data'].get('version')
 
     @property
     def dvr_url(self):
@@ -91,20 +101,18 @@ class ConfigurationManager:
                 json.dump(self.settings, file, indent=4)
 
         except Exception as e:
-            print(f"Exception in save_config: {e}")
+            self.gui.show_error(f"Exception in save_config: {e}")
 
     def load_config(self):
         if self.is_empty:
-            print("Config file is empty or does not exist.")
-        
-        app_version = self._shared_state['settings']['program_data']['version']
-        
+            self.gui.show_error("Config file is empty or does not exist.")
+
         try:
             with open(self.config_file_path, 'r', encoding='utf-8') as file:
                 self.settings = json.load(file)
-            
-            if self.settings['program_data']['version'] != app_version:
-                self.settings['program_data']['version'] = app_version
+
+            if self.settings['program_data']['version'] != self.program_version:
+                self.settings['program_data']['version'] = self.program_version
                 self.save_config()
         except Exception as e:
-            print(f"Exception in load_config: {e}")
+            self.gui.show_error(f"Exception in load_config: {e}")
