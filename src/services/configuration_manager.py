@@ -51,7 +51,7 @@ class ConfigurationManager:
     @property
     def program_author(self):
         return self.settings['program_data'].get('author')
-    
+
     @property
     def program_version(self):
         return self.settings['program_data'].get('version')
